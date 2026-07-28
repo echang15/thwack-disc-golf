@@ -21,6 +21,36 @@ Every throw is three timed presses of **SPACE** (or a tap / click):
 The disc then flies out under drag. Where it stops is where you throw from next,
 just like the real thing.
 
+## Trees, and what happens when you find them
+
+Discs **ricochet** off trunks rather than simply dying. The disc reflects about
+the surface normal, so the angle you strike at decides everything:
+
+| Impact | Deflection | Speed kept |
+| --- | --- | --- |
+| Dead centre | ~180° — straight back at you | 10% |
+| Half a radius out | ~90° | 21% |
+| Fine graze | ~3° | 50% |
+
+A square hit stops you dead. A glancing one is a **skip** that keeps running.
+
+Clip **two trees on one throw** and it's a **DOUBLE DOINK** — shockwave rings,
+a screen shake, and the disc's namesake plastered across the fairway.
+
+## Perfect throws and ONLY GRUMBY
+
+The power bar carries two zones: a narrow white box (the power that stops the
+disc on the basket) and a wider green **sweet spot**. Stop the power in the green
+band *and* the release dead centre, with no tree contact and no OB, and the throw
+is graded **perfect** — tracked by the pips in the header.
+
+Three perfect throws in a row and the next throw **throws itself**: the disc
+routes around every tree on a planned path and drops into the chains, guaranteed.
+Aim isn't graded, by the way — you pick your own line around the timber, so there
+is no "correct" angle to mark you against.
+
+A **hole in one** is met with the celebration it deserves: a parade of steaks.
+
 ## Scoring
 
 | Event | Points |
@@ -30,10 +60,10 @@ just like the real thing.
 | Holed on throw 3 | +40 |
 | Out of throws | +45 minus 1 per 7px of distance (max ~45, zero past ~170 ft) |
 | Hit a tree | −4 each |
+| Double doink (two trees, one throw) | −8 |
 | Out of bounds | −8 |
 
-Trees punish you twice: the points and the distance, since a `THWAP! FUCK!` kills
-almost all your speed and kicks the disc off at a random angle.
+Trees punish you twice: the points and the distance you lose to the ricochet.
 
 Players are drawn at random from a fixed roster: **The Lumberjack**, **Double
 Doink**, **Fucking Dave**, **Thwap! Fuck!**, and **He With Opinions**. Each plays a hole out in full
@@ -85,3 +115,14 @@ The flight model is `pos += v` with `v *= 0.985` per frame, so a throw's reach i
 perfect timing lands within a pixel of the pin. The basket catches the disc
 within 28px if it arrives slower than 1.7 units/frame — arrive hot and it spits
 out. Meter speeds scale up ~8% per hole.
+
+The perfect-throw windows are ~3 frames of meter travel wide (±47ms on power,
+±54ms on release). They were originally set to the width of the drawn pin box,
+which is ±0.9 frames — tighter than frame-perfect, which made the Grumby reward
+effectively unreachable.
+
+The Grumby shot plans its route with a grid A* (14px cells, trees dilated by the
+disc radius) and then string-pulls the result so the disc flies long clean lines
+instead of a grid staircase. A* is overkill for a dozen obstacles but it is
+*complete*: if a gap exists it will be found, which is what lets the reward
+promise a guaranteed hole-out.

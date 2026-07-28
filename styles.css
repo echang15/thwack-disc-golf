@@ -34,7 +34,7 @@ html, body {
 /* ---------- HUD ---------- */
 #hud {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1.1fr 1fr;
   gap: 8px;
   background: var(--panel);
   border: 1px solid var(--line);
@@ -60,6 +60,20 @@ html, body {
 }
 
 #playerName { color: var(--accent); }
+
+#streakInfo { letter-spacing: .16em; color: var(--muted); }
+#streakInfo.streak-lit { color: var(--accent-2); }
+#streakInfo.grumby-lit {
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: .08em;
+  animation: grumby-pulse 1s ease-in-out infinite;
+}
+
+@keyframes grumby-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
+}
 .hud-score strong { color: var(--accent-2); text-align: right; }
 .hud-score .label { text-align: right; }
 

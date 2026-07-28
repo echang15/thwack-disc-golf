@@ -16,7 +16,7 @@
   const BASKET_R = 28;                  // chains catch radius
   const CATCH_V = 1.7;                  // arrive faster than this and you blow through
   const OVERSHOOT = 1.35;               // power bar tops out at 135% of the shot needed
-  const NAME_POOL = ['The Lumberjack', 'Double Doink', 'Fucking Dave', 'Thwap! Fuck!'];
+  const NAME_POOL = ['The Lumberjack', 'Double Doink', 'Fucking Dave', 'Thwap! Fuck!', 'He With Opinions'];
 
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
@@ -229,7 +229,7 @@
     audio.ctxOk();
     switch (G.phase) {
       case 'title':
-        newGame(G.pendingPlayers || 4);
+        newGame(G.pendingPlayers || 5);
         break;
       case 'aim':
         G.aim = aimAngle();
@@ -791,10 +791,10 @@
       'Closer to the basket = more points. Trees cost you 4. Out of bounds costs 8.'
     ].forEach((t, i) => ctx.fillText(t, W / 2, 300 + i * 34));
 
-    const n = G.pendingPlayers || 4;
+    const n = G.pendingPlayers || 5;
     ctx.font = '700 22px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#8fa389';
-    ctx.fillText('Players (press 1–4 to change)', W / 2, 520);
+    ctx.fillText('Players (press 1–5 to change)', W / 2, 520);
     ctx.font = '900 46px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#5ad07a';
     ctx.fillText(`${n}`, W / 2, 570);
@@ -871,7 +871,7 @@
     if (e.code === 'Space' || e.code === 'Enter') {
       e.preventDefault();
       press();
-    } else if (G.phase === 'title' && /^Digit[1-4]$/.test(e.code)) {
+    } else if (G.phase === 'title' && /^Digit[1-5]$/.test(e.code)) {
       G.pendingPlayers = Number(e.code.slice(5));
     }
   });
@@ -885,6 +885,6 @@
     el.mute.setAttribute('aria-pressed', String(!audio.on));
   });
 
-  G.pendingPlayers = 4;
+  G.pendingPlayers = 5;
   tick();
 })();

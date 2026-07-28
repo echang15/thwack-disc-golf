@@ -1,8 +1,10 @@
 # THWACK! — Timing Disc Golf
 
-A browser disc golf game built on throw timing. Five holes, up to four players,
+A browser disc golf game built on throw timing. Five holes, up to five players,
 three throws each. No dependencies, no build step — three static files that drop
 straight onto GitHub Pages.
+
+**Play it: https://echang15.github.io/thwack-disc-golf/**
 
 ## How it plays
 
@@ -34,14 +36,14 @@ Trees punish you twice: the points and the distance, since a `THWAP! FUCK!` kill
 almost all your speed and kicks the disc off at a random angle.
 
 Players are drawn at random from a fixed roster: **The Lumberjack**, **Double
-Doink**, **Fucking Dave**, and **Thwap! Fuck!** Each plays a hole out in full
+Doink**, **Fucking Dave**, **Thwap! Fuck!**, and **He With Opinions**. Each plays a hole out in full
 before the next one tees off, and every player faces an identical layout — the
 courses are generated from a fixed seed per hole.
 
 ## Controls
 
 - **SPACE** / **ENTER** / tap / click — advance the current phase
-- **1–4** on the title screen — number of players
+- **1–5** on the title screen — number of players
 - 🔊 button — mute
 
 ## Running it locally

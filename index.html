@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>THWACK! — Timing Disc Golf</title>
+<meta name="description" content="A timing-based disc golf game. Three throws a hole, mind the trees." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🥏</text></svg>" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="shell">
+    <header id="hud">
+      <div class="hud-slot" id="hud-player">
+        <span class="label">Now throwing</span>
+        <strong id="playerName">—</strong>
+      </div>
+      <div class="hud-slot">
+        <span class="label">Hole</span>
+        <strong id="holeInfo">1 / 5</strong>
+      </div>
+      <div class="hud-slot">
+        <span class="label">Throw</span>
+        <strong id="throwInfo">1 of 3</strong>
+      </div>
+      <div class="hud-slot">
+        <span class="label">To basket</span>
+        <strong id="distInfo">—</strong>
+      </div>
+      <div class="hud-slot hud-score">
+        <span class="label">Points</span>
+        <strong id="pointsInfo">0</strong>
+      </div>
+    </header>
+
+    <div id="stage">
+      <canvas id="game" width="1400" height="700"></canvas>
+    </div>
+
+    <footer id="controls">
+      <button id="actionBtn" type="button">SPACE / TAP</button>
+      <p id="hint">Press to begin.</p>
+      <button id="muteBtn" type="button" class="ghost" aria-pressed="false">🔊</button>
+    </footer>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+:root {
+  --bg: #10170f;
+  --panel: #182219;
+  --line: #2c3a2c;
+  --ink: #e8f0e4;
+  --muted: #8fa389;
+  --accent: #ffd75e;
+  --accent-2: #5ad07a;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+#shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 100%;
+}
+
+/* ---------- HUD ---------- */
+#hud {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.hud-slot { display: flex; flex-direction: column; min-width: 0; }
+
+.hud-slot .label {
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hud-slot strong {
+  font-size: 19px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#playerName { color: var(--accent); }
+.hud-score strong { color: var(--accent-2); text-align: right; }
+.hud-score .label { text-align: right; }
+
+/* ---------- Stage ---------- */
+#stage {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0c120b;
+  line-height: 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+/* ---------- Controls ---------- */
+#controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+#actionBtn {
+  flex: 0 0 auto;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: .08em;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px solid #3f5a3f;
+  background: linear-gradient(#2f4a2f, #223622);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+#actionBtn:active { transform: translateY(1px); }
+
+#hint {
+  flex: 1 1 auto;
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+button.ghost {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+@media (max-width: 720px) {
+  #hud { grid-template-columns: 1fr 1fr 1fr; }
+  #hud-player { grid-column: 1 / -1; }
+  .hud-slot strong { font-size: 16px; }
+  #actionBtn { padding: 12px 16px; }
+  #hint { font-size: 13px; }
+}

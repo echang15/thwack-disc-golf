@@ -31,6 +31,28 @@
   const PERFECTS_FOR_GRUMBY = 3;
   const NAME_POOL = ['The Lumberjack', 'Double Doink', 'Fucking Dave', 'Thwap! Fuck!', 'He With Opinions'];
 
+  // Courses: same five-hole structure, different knobs. treeCountMul/treeSizeMul
+  // thicken the timber, speedMul speeds up every meter, windowMul shrinks the
+  // perfect-throw credit (and the pin box stays put, so "lands on the basket"
+  // never changes — only how forgiving "perfect" is does).
+  const COURSES = [
+    {
+      id: 'breezy', name: 'Breezy Pines', tag: 'EASY', seed: 0xC0FFEE,
+      treeCountMul: 0.6, treeSizeMul: 0.85, speedMul: 0.8, windowMul: 1.3,
+      blurb: 'Open fairways, forgiving timing.'
+    },
+    {
+      id: 'thwack', name: 'THWACK Classic', tag: 'MEDIUM', seed: 0xFACADE,
+      treeCountMul: 1, treeSizeMul: 1, speedMul: 1, windowMul: 1,
+      blurb: 'The original five. Balanced and fair.'
+    },
+    {
+      id: 'deadfall', name: 'Deadfall Ridge', tag: 'HARD', seed: 0xBADA55,
+      treeCountMul: 1.5, treeSizeMul: 1.15, speedMul: 1.25, windowMul: 0.7,
+      blurb: 'Dense timber, faster meters, tight windows.'
+    }
+  ];
+
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
   const el = {
@@ -122,7 +144,8 @@
 
   // ------------------------------------------------------------- hole builder
   function buildHole(index) {
-    const rng = makeRng(0xC0FFEE + index * 7919);
+    const course = G.course || COURSES[1];
+    const rng = makeRng(course.seed + index * 7919);
     const tee = { x: 110, y: H / 2 + (rng() - 0.5) * 220 };
     const basket = {
       x: 1010 + rng() * 250,
@@ -130,13 +153,13 @@
     };
 
     const trees = [];
-    const wanted = 11 + index * 3;
+    const wanted = Math.max(6, Math.round((11 + index * 3) * course.treeCountMul));
     let guard = 0;
     while (trees.length < wanted && guard++ < 4000) {
       const t = {
         x: 260 + rng() * (W - 380),
         y: 50 + rng() * (H - 100),
-        r: 17 + rng() * 13
+        r: (17 + rng() * 13) * course.treeSizeMul
       };
       if (dist(t, tee) < 150) continue;
       if (dist(t, basket) < 95) continue;
@@ -319,6 +342,7 @@
   function newGame(playerCount) {
     const names = shuffle(NAME_POOL).slice(0, playerCount);
     G.players = names.map(n => ({ name: n, points: 0, holes: [], streak: 0, grumby: false }));
+    G.course = COURSES[G.courseIndex];
     G.fx = {};
     G.holeIndex = 0;
     G.turn = 0;
@@ -385,7 +409,7 @@
   function syncHud() {
     if (!G.players.length) return;
     el.player.textContent = player().name;
-    el.hole.textContent = `${G.holeIndex + 1} / ${HOLES}`;
+    el.hole.textContent = `${G.holeIndex + 1} / ${HOLES} · ${G.course.tag}`;
     el.throw.textContent = `${Math.min(G.throwNo, THROWS_PER_HOLE)} of ${THROWS_PER_HOLE}`;
     el.dist.textContent = G.hole ? `${feet(dist(G.disc, G.hole.basket))} ft` : '—';
     el.points.textContent = player().points;
@@ -404,7 +428,9 @@
   // ------------------------------------------------------------------- meters
   // Aim sweeps ±42° around the straight line to the basket.
   const AIM_SPAN = 32 * Math.PI / 180;
-  function meterSpeed() { return 1 + G.holeIndex * 0.08; }
+  function meterSpeed() { return (1 + G.holeIndex * 0.08) * (G.course ? G.course.speedMul : 1); }
+  function effPowerWindow() { return POWER_WINDOW * (G.course ? G.course.windowMul : 1); }
+  function effCurveWindow() { return CURVE_WINDOW * (G.course ? G.course.windowMul : 1); }
 
   function aimAngle() {
     const base = Math.atan2(G.hole.basket.y - G.disc.y, G.hole.basket.x - G.disc.x);
@@ -499,8 +525,8 @@
   // angle to grade them against.
   function isPerfectRelease() {
     const ideal = idealPower();
-    const powerOk = ideal > 1 ? G.power >= 0.97 : Math.abs(G.power - ideal) <= POWER_WINDOW;
-    return powerOk && Math.abs(G.curve) <= CURVE_WINDOW;
+    const powerOk = ideal > 1 ? G.power >= 0.97 : Math.abs(G.power - ideal) <= effPowerWindow();
+    return powerOk && Math.abs(G.curve) <= effCurveWindow();
   }
 
   function stepFlight() {
@@ -1126,7 +1152,7 @@
         const mx = bx + bw * clamp(ideal, 0, 1);
         // Outer band = perfect-throw credit; inner box = lands on the pin.
         ctx.fillStyle = 'rgba(90,208,122,0.28)';
-        ctx.fillRect(mx - POWER_WINDOW * bw, by, POWER_WINDOW * bw * 2, bh);
+        ctx.fillRect(mx - effPowerWindow() * bw, by, effPowerWindow() * bw * 2, bh);
         ctx.fillStyle = 'rgba(255,255,255,0.22)';
         ctx.fillRect(mx - PIN_PX, by, PIN_PX * 2, bh);
         ctx.strokeStyle = '#ffffff';
@@ -1149,7 +1175,7 @@
       ctx.fillRect(bx, by, bw, bh);
 
       // Centre = clean release, and the width that earns perfect credit.
-      const half = CURVE_WINDOW * (bw / 2);
+      const half = effCurveWindow() * (bw / 2);
       ctx.fillStyle = 'rgba(90,208,122,0.35)';
       ctx.fillRect(bx + bw / 2 - half, by, half * 2, bh);
 
@@ -1247,15 +1273,15 @@
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = 'center';
 
-    ctx.font = '900 92px "Trebuchet MS", sans-serif';
+    ctx.font = '900 80px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#ffd75e';
-    ctx.fillText('THWACK!', W / 2, 190);
+    ctx.fillText('THWACK!', W / 2, 150);
 
-    ctx.font = '700 26px "Trebuchet MS", sans-serif';
+    ctx.font = '700 22px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#e8f0e4';
-    ctx.fillText('Timing-based disc golf. Five holes, three throws each.', W / 2, 238);
+    ctx.fillText('Timing-based disc golf. Five holes, three throws each.', W / 2, 190);
 
-    ctx.font = '600 20px "Trebuchet MS", sans-serif';
+    ctx.font = '600 18px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#b9cbb2';
     [
       '1. AIM — stop the sweeping arrow on your line',
@@ -1264,19 +1290,30 @@
       '',
       'Discs ricochet off trunks — square on kills it, a glancing skip runs on.',
       'Nail both meters 3 throws running and ONLY GRUMBY throws the next one for you.'
-    ].forEach((t, i) => ctx.fillText(t, W / 2, 300 + i * 32));
+    ].forEach((t, i) => ctx.fillText(t, W / 2, 232 + i * 26));
+
+    const course = COURSES[G.courseIndex];
+    ctx.font = '700 18px "Trebuchet MS", sans-serif';
+    ctx.fillStyle = '#8fa389';
+    ctx.fillText('Course (press ◀ ▶ to change)', W / 2, 438);
+    ctx.font = '900 32px "Trebuchet MS", sans-serif';
+    ctx.fillStyle = course.tag === 'EASY' ? '#5ad07a' : course.tag === 'HARD' ? '#ff6b5e' : '#ffd75e';
+    ctx.fillText(`${course.name} — ${course.tag}`, W / 2, 474);
+    ctx.font = '600 16px "Trebuchet MS", sans-serif';
+    ctx.fillStyle = '#b9cbb2';
+    ctx.fillText(course.blurb, W / 2, 498);
 
     const n = G.pendingPlayers || 5;
-    ctx.font = '700 22px "Trebuchet MS", sans-serif';
+    ctx.font = '700 20px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#8fa389';
-    ctx.fillText('Players (press 1–5 to change)', W / 2, 520);
-    ctx.font = '900 46px "Trebuchet MS", sans-serif';
+    ctx.fillText('Players (press 1–5 to change)', W / 2, 544);
+    ctx.font = '900 38px "Trebuchet MS", sans-serif';
     ctx.fillStyle = '#5ad07a';
-    ctx.fillText(`${n}`, W / 2, 570);
+    ctx.fillText(`${n}`, W / 2, 586);
 
-    ctx.font = '700 24px "Trebuchet MS", sans-serif';
+    ctx.font = '700 22px "Trebuchet MS", sans-serif';
     ctx.fillStyle = Math.floor(G.t / 30) % 2 ? '#ffffff' : '#ffd75e';
-    ctx.fillText('PRESS SPACE / TAP TO TEE OFF', W / 2, 630);
+    ctx.fillText('PRESS SPACE / TAP TO TEE OFF', W / 2, 636);
     ctx.textAlign = 'left';
   }
 
@@ -1315,7 +1352,7 @@
     if (G.phase === 'title' || G.phase === 'gameOver' || !G.hole) return;
     ctx.font = '700 15px "Trebuchet MS", sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.fillText(`HOLE ${G.holeIndex + 1} · PAR ${G.hole.par} · ${feet(dist(G.hole.tee, G.hole.basket))} ft`, 26, 40);
+    ctx.fillText(`${G.course.name} · HOLE ${G.holeIndex + 1} · PAR ${G.hole.par} · ${feet(dist(G.hole.tee, G.hole.basket))} ft`, 26, 40);
   }
 
   // -------------------------------------------------------------------- loop
@@ -1356,6 +1393,10 @@
       press();
     } else if (G.phase === 'title' && /^Digit[1-5]$/.test(e.code)) {
       G.pendingPlayers = Number(e.code.slice(5));
+    } else if (G.phase === 'title' && e.code === 'ArrowLeft') {
+      G.courseIndex = (G.courseIndex - 1 + COURSES.length) % COURSES.length;
+    } else if (G.phase === 'title' && e.code === 'ArrowRight') {
+      G.courseIndex = (G.courseIndex + 1) % COURSES.length;
     }
   });
 
@@ -1369,5 +1410,6 @@
   });
 
   G.pendingPlayers = 5;
+  G.courseIndex = 1;
   tick();
 })();

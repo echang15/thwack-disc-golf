@@ -70,10 +70,24 @@ Doink**, **Fucking Dave**, **Thwap! Fuck!**, and **He With Opinions**. Each play
 before the next one tees off, and every player faces an identical layout — the
 courses are generated from a fixed seed per hole.
 
+## Courses
+
+Three courses, same five-hole structure, different knobs:
+
+| Course | Difficulty | What changes |
+| --- | --- | --- |
+| Breezy Pines | Easy | Fewer, smaller trees · slower meters · wider perfect-throw windows |
+| THWACK Classic | Medium | The original layout and tuning |
+| Deadfall Ridge | Hard | More, bigger trees · faster meters · tight perfect-throw windows |
+
+Each course has its own fixed seed, so every player on a given course still
+faces an identical layout. Pick one from the title screen before teeing off.
+
 ## Controls
 
 - **SPACE** / **ENTER** / tap / click — advance the current phase
 - **1–5** on the title screen — number of players
+- **◀ / ▶** on the title screen — change course
 - 🔊 button — mute
 
 ## Running it locally
